@@ -28,7 +28,7 @@ router.post("/rent", async (req, res) => {
       rentedSpace,
     });
 
-    // Update the used space by adding the rented amount
+    //upadte space
     space.usedSpace += rentedSpace;
 
     // Save
