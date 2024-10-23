@@ -11,7 +11,7 @@ const spaceProviderSchema = new mongoose.Schema({
   },
   usedSpace: {
     type: Number,
-    default: 0, // Initially no space is used
+    default: 0, // default 0
   },
   renters: [
     {
