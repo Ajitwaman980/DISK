@@ -1,9 +1,15 @@
-const mongoose = require("mongoose");
+// Import mongoose
+import mongoose from "mongoose";
 
+//  SpaceBuyer schema
 const spaceBuyerSchema = new mongoose.Schema({
+  spaceBuyer_ID: {
+    type: mongoose.Types.ObjectId,
+  },
   buyerId: {
-    type: String,
+    type: String, // MetaMask ID
     required: true,
+    unique: true,
   },
   rentedSpace: {
     type: Number, // Rented space in GB
@@ -14,9 +20,10 @@ const spaceBuyerSchema = new mongoose.Schema({
     required: true,
   },
   ipfsHashes: {
-    type: [String], // Store file hashes related to this buyer
+    type: [String],
     default: [],
   },
 });
 
-module.exports = mongoose.model("SpaceBuyer", spaceBuyerSchema);
+// Export the model
+export default mongoose.model("SpaceBuyer", spaceBuyerSchema);

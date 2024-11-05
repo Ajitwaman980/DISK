@@ -1,21 +1,24 @@
-const express = require("express");
+import express from "express";
+import SpaceBuyer from "../model/spaceBuyerSchema.js"; // buyer
+import Provider from "../model/spaceProviderSchema.js"; // Import provider model
+
 const router = express.Router();
-const SpaceRent = require("../model/spaceBuyerSchema ");
 
 // (for Node 2 Client)
-router.post("/rent", async (req, res) => {
-  try {
-    const { clientId, ownerId, rentedSpace } = req.body;
+router.post("/buyer", async (req, res) => {
+  console.log("Renting request tested");
+  const { buyerId, providerId, rentedSpace } = req.body;
+  // console.log(buyerId, providerId, rentedSpace);
 
-    // Find the space allocated by the provider (Node 1)
-    const space = await SpaceRent.findOne({ ownerId });
-    if (!space) {
-      return res
-        .status(400)
-        .json({ message: "No space allocated by this owner" });
+  try {
+    // Find the provider to verify they exist
+    const provider = await Provider.findOne({ providerId });
+    if (!provider) {
+      return res.status(400).json({ message: "Provider not found" });
     }
 
-    const availableSpace = SpaceRent.allocatedSpace - SpaceRent.usedSpace;
+    // Check available space in the provider
+    const availableSpace = provider.allocatedSpace - provider.usedSpace;
     if (rentedSpace > availableSpace) {
       return res
         .status(400)
@@ -23,26 +26,34 @@ router.post("/rent", async (req, res) => {
     }
 
     // Add the client (Node 2) as a renter and allocate the rented space
-    space.renters.push({
-      clientId,
+    provider.renters.push({
+      buyerId,
       rentedSpace,
     });
+    // buyer data
+    const buyerSpace = new SpaceBuyer({
+      buyerId,
+      rentedSpace,
+      providerId,
+    });
 
-    //upadte space
-    space.usedSpace += rentedSpace;
+    // Update usedSpace
+    provider.usedSpace += rentedSpace;
 
-    // Save
-    await space.save();
+    // Save changes to the provider and buyer space
+    await provider.save();
+    await buyerSpace.save();
 
     res.status(201).json({
       message: "Space rented successfully",
-      ownerId: space.ownerId,
-      clientId: clientId,
+      providerId: provider.providerId,
+      clientId: buyerId,
       rentedSpace: rentedSpace,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error renting space", error });
+    console.error(error); // Log error to see details in console
+    res.status(500).json({ message: "Error renting space client side", error });
   }
 });
 
-module.exports = router;
+export default router;

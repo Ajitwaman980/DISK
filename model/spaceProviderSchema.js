@@ -1,9 +1,14 @@
-const mongoose = require("mongoose");
+// Import mongoose
+import mongoose from "mongoose";
 
 const spaceProviderSchema = new mongoose.Schema({
+  spaceProvider_ID: {
+    type: mongoose.Types.ObjectId,
+  },
   providerId: {
-    type: String,
+    type: String, // metamask id
     required: true,
+    unique: true,
   },
   allocatedSpace: {
     type: Number, // Space allocated in GB
@@ -15,7 +20,7 @@ const spaceProviderSchema = new mongoose.Schema({
   },
   renters: [
     {
-      buyerId: String, // ID of the buyer (cleint )
+      buyerId: String, // ID of the buyer (client)
       rentedSpace: Number, // how much want
     },
   ],
@@ -25,4 +30,5 @@ const spaceProviderSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("SpaceProvider", spaceProviderSchema);
+// Export the model
+export default mongoose.model("SpaceProvider", spaceProviderSchema);
